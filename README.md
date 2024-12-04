@@ -20,13 +20,19 @@ Almost all the logic is in the three library modules
 Below is a list of the endpoints that are currently supported for fetching data.\
 **URL Examples (using custdemo)**
 
- - /custdemo/table/{table} => List of all the records in the specified table                   |
- - /custdemo/table/{table}/count => Number of records in the specified table                         |
- - /custdemo/table/{table}/schema => List of columns and data type in the specified table             |
- - /custdemo/table/{table}/limit/{limit} => List of first x (limit) records in the specified table           |
- - /custdemo/table/{table}/limit/{limit}/offset/{offset} => List of first x (limit) records in the specified table, using\
-                                                            the offset are the starting point
- - /custdemo/table/{table}/query?column={column}&value={value} => List of all the records in the specified table where\
-                                                                  column = value.
- - /custdemo/table/{table}/query?columns={col1,col2,col3}&values={val1,val2,val3}&operators={op1, op2, op3} => List of all the records in the specified groups
+ - /custdemo/table/{table} => List of all the records in the specified table
+ - /custdemo/table/{table}/count => Number of records in the specified table
+ - /custdemo/table/{table}/schema => List of columns and data type in the specified table
+ - /custdemo/table/{table}/limit/{limit} => List of first x (limit) records in the specified table
+ - /custdemo/table/{table}/limit/{limit}/offset/{offset} => 
+List of first x (limit) records in the specified table, using
+the offset are the starting point
+ - /custdemo/table/{table}/query?column={column}&value={value} =>
+List of all the records in the specified table where
+column = value.
+ - /custdemo/table/{table}/query?columns={col1,col2,col3}&values={val1,val2,val3}&operators={op1, op2, op3} =>
+List of all the records in the specified groups
+
+##Additional Notes:
+See the Confluence page https://4js.atlassian.net/wiki/spaces/FPS/pages/723419137/Genero+Generic+REST+API for more details.
 

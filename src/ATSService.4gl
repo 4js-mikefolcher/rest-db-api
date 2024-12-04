@@ -13,7 +13,7 @@ MAIN
 
   CALL com.WebServiceEngine.RegisterRestService("ServiceHelper","ats")
 
-  CALL STARTLOG("ATSService.log")
+  CALL startlog("ATSService.log")
 
   DISPLAY "Server started"
 

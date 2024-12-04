@@ -14,7 +14,7 @@ MAIN
 
   CALL com.WebServiceEngine.RegisterRestService("ServiceHelper","custdemo")
 
-  CALL STARTLOG("custdemoService.log")
+  CALL startlog("custdemoService.log")
 
   IF arg_val(1) == "--debug" THEN
 	  LET ServiceHelper.useScopes = FALSE

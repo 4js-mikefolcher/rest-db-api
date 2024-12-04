@@ -52,7 +52,7 @@ PUBLIC FUNCTION getTableRecords(
                 CALL sqlObj.fetch()
             END IF
 
-            IF SQLCA.sqlcode == NOTFOUND THEN
+            IF sqlca.sqlcode == NOTFOUND THEN
                 LET lMoreRecords = FALSE
             ELSE
                 #Create a JSON Object for each record
@@ -383,7 +383,7 @@ PUBLIC FUNCTION getTableSchema(tableName STRING) RETURNS DICTIONARY OF STRING
 END FUNCTION #getTableSchema
 
 PRIVATE FUNCTION errorHandler()
-    CALL ERRORLOG(SFMT("Error Code: %1", STATUS))
-    CALL ERRORLOG(base.Application.getStackTrace())
+    CALL errorlog(SFMT("Error Code: %1", status))
+    CALL errorlog(base.Application.getStackTrace())
     EXIT PROGRAM -1
 END FUNCTION

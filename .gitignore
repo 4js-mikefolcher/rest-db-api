@@ -43,3 +43,6 @@ database/
 # Genero Source code documentation
 *.html
 *.xa
+
+# Genero Linter files
+*.4gl~

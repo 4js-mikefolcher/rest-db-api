@@ -8,7 +8,8 @@ IMPORT FGL SQLHelper
 IMPORT FGL UserScopes
 
 PUBLIC DEFINE internalError
-    RECORD ATTRIBUTE(WSError = "Internal Server Error", json_name = "responseError")
+    RECORD ATTRIBUTE(WSError = "Internal Server Error",
+        json_name = "responseError")
     respCode INTEGER,
     respMessage STRING
 END RECORD
@@ -26,7 +27,8 @@ PUBLIC DEFINE badRequestError
 END RECORD
 
 PUBLIC DEFINE unAuthError
-    RECORD ATTRIBUTE(WSError = "User not authorized", json_name = "responseError")
+    RECORD ATTRIBUTE(WSError = "User not authorized",
+        json_name = "responseError")
     respCode INTEGER,
     respMessage STRING
 END RECORD
@@ -321,7 +323,8 @@ PUBLIC FUNCTION getRecordsQuery(
         END IF
     END FOR
     IF colList.getLength() > 0 THEN
-        LET jsonArray = SQLHelper.getTableQuery(tableName, colList, valList, opListSQL)
+        LET jsonArray =
+            SQLHelper.getTableQuery(tableName, colList, valList, opListSQL)
     END IF
 
     IF jsonArray IS NULL THEN
@@ -341,7 +344,8 @@ END FUNCTION #getRecordsQuery
 #+
 ##############################################################################################
 #TODO: This function needs to be implemented
-PUBLIC FUNCTION getQueryResults(jsonObj util.JSONObject)
+PUBLIC FUNCTION getQueryResults(
+    jsonObj util.JSONObject)
     ATTRIBUTES(WSPost,
         WSPath = "/sql",
         WSDescription = 'Executes a specified query')
@@ -398,20 +402,20 @@ PRIVATE FUNCTION getQueryOperation(query STRING)
     LET qTrim = query.toLowerCase().trimLeftWhiteSpace()
     LET qTrim = qTrim.split('[ \t\n\r]')[1]
     CASE qTrim
-    WHEN 'select'
-        LET opStr = UserScopes.cFetchOperation
-    WHEN 'insert'
-        LET opStr = UserScopes.cInsertOperation
-    WHEN 'update'
-        LET opStr = UserScopes.cUpdateOperation
-    WHEN 'delete'
-        LET opStr = UserScopes.cDeleteOperation
-    OTHERWISE
-        LET opStr = 'UNKNOWN'
+        WHEN 'select'
+            LET opStr = UserScopes.cFetchOperation
+            WHEN 'insert'
+                LET opStr = UserScopes.cInsertOperation
+            WHEN 'update'
+                LET opStr = UserScopes.cUpdateOperation
+            WHEN 'delete'
+                LET opStr = UserScopes.cDeleteOperation
+        OTHERWISE
+            LET opStr = 'UNKNOWN'
     END CASE
-    
+
     RETURN opStr
-    
+
 END FUNCTION
 
 PRIVATE FUNCTION getSqlOperator(restOperator STRING)
@@ -420,7 +424,9 @@ PRIVATE FUNCTION getSqlOperator(restOperator STRING)
 
 END FUNCTION #getSqlOperator
 
-PRIVATE FUNCTION authorizationCheck(tabname STRING, operation STRING) RETURNS BOOLEAN
+PRIVATE FUNCTION authorizationCheck(
+    tabname STRING, operation STRING)
+    RETURNS BOOLEAN
     DEFINE userScopes UserScopes.TUserScopes
 
     IF NOT useScopes THEN
@@ -458,7 +464,8 @@ FUNCTION setRestError(respCode STRING, tableName STRING)
             CALL com.WebServiceEngine.SetRestError(httpStatus, notFoundError)
         WHEN _ERR_TABLE_DNE
             LET httpStatus = _ERR_NOT_FOUND
-            LET notFoundError.respMessage = SFMT("Table %1 does not exist", tableName)
+            LET notFoundError.respMessage =
+                SFMT("Table %1 does not exist", tableName)
             CALL com.WebServiceEngine.SetRestError(httpStatus, notFoundError)
         WHEN _ERR_TABLE_EMPTY
             LET httpStatus = _ERR_INTERNAL
@@ -467,7 +474,8 @@ FUNCTION setRestError(respCode STRING, tableName STRING)
             CALL com.WebServiceEngine.SetRestError(httpStatus, internalError)
         WHEN _ERR_ARG_CNT_MISMATCH
             LET httpStatus = _ERR_BAD_REQUEST
-            LET badRequestError.respMessage = SFMT("Argument count mismatch", tableName)
+            LET badRequestError.respMessage =
+                SFMT("Argument count mismatch", tableName)
             CALL com.WebServiceEngine.SetRestError(httpStatus, badRequestError)
         OTHERWISE # Unknown, assume internal server error since we missed a case
             LET httpStatus = _ERR_INTERNAL

@@ -59,7 +59,8 @@ PUBLIC FUNCTION getTableRecords(
                 LET jsonObj = util.JSONObject.create()
                 FOR lIndex = 1 TO sqlObj.getResultCount()
                     CALL jsonObj.put(
-                        sqlObj.getResultName(lIndex), sqlObj.getResultValue(lIndex))
+                        sqlObj.getResultName(lIndex),
+                        sqlObj.getResultValue(lIndex))
                 END FOR
 
                 #Add the JSON Object to the JSON Array
@@ -106,7 +107,9 @@ PUBLIC FUNCTION getTableQuery(
     #Initialize the SQL Statement and JSON Array
     LET lSQLSelect = SFMT("SELECT * FROM %1 WHERE", tableName)
     FOR colIdx = 1 TO colName.getLength()
-        LET lSQLSelect = lSQLSelect, SFMT(" (%1 %2 ?) AND", colName[colIdx], operator[colIdx])
+        LET lSQLSelect =
+            lSQLSelect,
+            SFMT(" (%1 %2 ?) AND", colName[colIdx], operator[colIdx])
     END FOR
     LET lSQLSelect = lSQLSelect.trimRight(), " 1=1"
 
@@ -120,7 +123,8 @@ PUBLIC FUNCTION getTableQuery(
 
 END FUNCTION
 
-PUBLIC FUNCTION getQuery(lQuery STRING, paramList util.JSONArray)
+PUBLIC FUNCTION getQuery(
+    lQuery STRING, paramList util.JSONArray)
     RETURNS util.JSONArray
 
     DEFINE sqlObj base.SqlHandle
@@ -150,7 +154,8 @@ PUBLIC FUNCTION getQuery(lQuery STRING, paramList util.JSONArray)
                 LET jsonObj = util.JSONObject.create()
                 FOR lIndex = 1 TO sqlObj.getResultCount()
                     CALL jsonObj.put(
-                        sqlObj.getResultName(lIndex), sqlObj.getResultValue(lIndex))
+                        sqlObj.getResultName(lIndex),
+                        sqlObj.getResultValue(lIndex))
                 END FOR
                 #Add the JSON Object to the JSON Array
                 LET lCount = lCount + 1

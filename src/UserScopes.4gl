@@ -1,6 +1,3 @@
-PUBLIC CONSTANT cInsertOperation = "insert"
-PUBLIC CONSTANT cUpdateOperation = "update"
-PUBLIC CONSTANT cDeleteOperation = "delete"
 PUBLIC CONSTANT cFetchOperation = "fetch"
 
 PUBLIC TYPE TUserScopes RECORD

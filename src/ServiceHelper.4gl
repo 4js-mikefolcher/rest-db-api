@@ -6,6 +6,7 @@ IMPORT com
 IMPORT util
 IMPORT FGL SQLHelper
 IMPORT FGL UserScopes
+IMPORT FGL jsonParser
 
 PUBLIC DEFINE internalError
     RECORD ATTRIBUTE(WSError = "Internal Server Error",
@@ -343,42 +344,24 @@ END FUNCTION #getRecordsQuery
 #+ getQueryResults Gets and returns all the records in a table that match the query criteria.
 #+
 ##############################################################################################
-#TODO: This function needs to be implemented
 PUBLIC FUNCTION getQueryResults(
     jsonObj util.JSONObject)
     ATTRIBUTES(WSPost,
         WSPath = "/sql",
         WSDescription = 'Executes a specified query')
     RETURNS util.JSONArray ATTRIBUTES(WSMedia = "application/json")
-
     DEFINE jsonArray util.JSONArray
-    #DEFINE jsonObj util.JSONObject
-    #DEFINE query STRING
+    DEFINE sqlString STRING
+    DEFINE temp_rec jsonParser.t_jsonBody
+    CALL jsonObj.toFGL(temp_rec)
+    LET sqlString = temp_rec.toSQLString()
+    DISPLAY sqlString
+    LET jsonArray = SQLHelper.runSQL(sqlString)
 
     # TODO: parse query to get table names and check authorization?
     IF NOT authorizationCheck("sql", UserScopes.cFetchOperation) THEN
         RETURN jsonArray
     END IF
-
---    {
---      "sql_command": "SELECT * FROM xyz WHERE col1 = ? AND col2 = ?",
---      "parameters": [
---        "A",
---        "01/01/2022"
---       ],
---      "limit": 100,
---      "offset": 200
---    }
-
-    #VAR paramList util.JSONArray = jsonObj.get("param")
-    {VAR paramListStr DYNAMIC ARRAY OF STRING
-    VAR i = 0
-    FOR i=1 TO paramList.getLength()
-        LET paramListStr[paramListStr.getLength()+1] = paramList.get(i)
-    END FOR}
-
-    #LET jsonArray = getQuery(query, paramList)
-
     RETURN jsonArray
 
 END FUNCTION #getQueryResults
@@ -404,12 +387,6 @@ PRIVATE FUNCTION getQueryOperation(query STRING)
     CASE qTrim
         WHEN 'select'
             LET opStr = UserScopes.cFetchOperation
-            WHEN 'insert'
-                LET opStr = UserScopes.cInsertOperation
-            WHEN 'update'
-                LET opStr = UserScopes.cUpdateOperation
-            WHEN 'delete'
-                LET opStr = UserScopes.cDeleteOperation
         OTHERWISE
             LET opStr = 'UNKNOWN'
     END CASE

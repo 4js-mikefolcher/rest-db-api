@@ -34,12 +34,7 @@ PUBLIC FUNCTION (temp_rec t_jsonBody) toSQLString() RETURNS STRING
     IF temp_rec.whereList.getLength() > 0 THEN
         LET sqlString ,= " WHERE "
         FOR i = 1 TO temp_rec.whereList.getLength()
-            #TODO Check for value type
-            IF temp_rec.whereList[i].value LIKE "%%" THEN
-                LET sqlString ,= temp_rec.whereList[i].column || " " || temp_rec.whereList[i].operator || " '" || temp_rec.whereList[i].value || "'"
-            ELSE
-                LET sqlString ,= temp_rec.whereList[i].column || " " || temp_rec.whereList[i].operator || " " || temp_rec.whereList[i].value
-            END IF
+            LET sqlString ,= temp_rec.whereList[i].column || " " || temp_rec.whereList[i].operator || " '" || temp_rec.whereList[i].value || "'"
             IF i < temp_rec.whereList.getLength() THEN
                 LET sqlString ,= " AND "
             END IF

@@ -355,7 +355,6 @@ PUBLIC FUNCTION getQueryResults(
     DEFINE temp_rec jsonParser.t_jsonBody
     CALL jsonObj.toFGL(temp_rec)
     LET sqlString = temp_rec.toSQLString()
-    DISPLAY sqlString
     LET jsonArray = SQLHelper.runSQL(sqlString)
 
     # TODO: parse query to get table names and check authorization?

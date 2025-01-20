@@ -174,7 +174,7 @@ END FUNCTION
 
 ##############################################################################################
 #+
-#+ getRecordCount Gets and returns all number of records in a table
+#+ getSchema Gets and returns the schema for a table
 #+
 ##############################################################################################
 PUBLIC FUNCTION getSchema(
@@ -341,7 +341,7 @@ PUBLIC FUNCTION getRecordsQuery(
 END FUNCTION #getRecordsQuery
 ##############################################################################################
 #+
-#+ getQueryResults Gets and returns all the records in a table that match the query criteria.
+#+ getQueryResults receives POST JSON body returns all the records in a table that match the query criteria from the body.
 #+
 ##############################################################################################
 PUBLIC FUNCTION getQueryResults(

@@ -1,0 +1,12 @@
+# Use 'fglcomp --format --fo-inplace filename' to avoid bloat files
+--fo-align-consecutive-assignments=1
+--fo-align-consectuvie-types=1
+--fo-align-trailing-comments=1
+--fo-column-limit=80
+--fo-indent-width=4
+--fo-continuation-indent-width=4
+--fo-label-indent=1
+--fo-pack=1
+--fo-lowercase-keywords=0
+--fo-use-tab=1
+--fo-tab-width=8

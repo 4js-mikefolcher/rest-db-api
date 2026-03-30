@@ -6,9 +6,11 @@ IMPORT com
 IMPORT util
 IMPORT FGL SQLHelper
 IMPORT FGL UserScopes
+IMPORT FGL jsonParser
 
 PUBLIC DEFINE internalError
-    RECORD ATTRIBUTE(WSError = "Internal Server Error", json_name = "responseError")
+    RECORD ATTRIBUTE(WSError = "Internal Server Error",
+        json_name = "responseError")
     respCode INTEGER,
     respMessage STRING
 END RECORD
@@ -26,7 +28,8 @@ PUBLIC DEFINE badRequestError
 END RECORD
 
 PUBLIC DEFINE unAuthError
-    RECORD ATTRIBUTE(WSError = "User not authorized", json_name = "responseError")
+    RECORD ATTRIBUTE(WSError = "User not authorized",
+        json_name = "responseError")
     respCode INTEGER,
     respMessage STRING
 END RECORD
@@ -171,7 +174,7 @@ END FUNCTION
 
 ##############################################################################################
 #+
-#+ getRecordCount Gets and returns all number of records in a table
+#+ getSchema Gets and returns the schema for a table
 #+
 ##############################################################################################
 PUBLIC FUNCTION getSchema(
@@ -321,7 +324,8 @@ PUBLIC FUNCTION getRecordsQuery(
         END IF
     END FOR
     IF colList.getLength() > 0 THEN
-        LET jsonArray = SQLHelper.getTableQuery(tableName, colList, valList, opListSQL)
+        LET jsonArray =
+            SQLHelper.getTableQuery(tableName, colList, valList, opListSQL)
     END IF
 
     IF jsonArray IS NULL THEN
@@ -337,44 +341,26 @@ PUBLIC FUNCTION getRecordsQuery(
 END FUNCTION #getRecordsQuery
 ##############################################################################################
 #+
-#+ getQueryResults Gets and returns all the records in a table that match the query criteria.
+#+ getQueryResults receives POST JSON body returns all the records in a table that match the query criteria from the body.
 #+
 ##############################################################################################
-#TODO: This function needs to be implemented
-PUBLIC FUNCTION getQueryResults(jsonObj util.JSONObject)
+PUBLIC FUNCTION getQueryResults(
+    jsonObj util.JSONObject)
     ATTRIBUTES(WSPost,
         WSPath = "/sql",
         WSDescription = 'Executes a specified query')
     RETURNS util.JSONArray ATTRIBUTES(WSMedia = "application/json")
-
     DEFINE jsonArray util.JSONArray
-    #DEFINE jsonObj util.JSONObject
-    #DEFINE query STRING
+    DEFINE sqlString STRING
+    DEFINE temp_rec jsonParser.t_jsonBody
+    CALL jsonObj.toFGL(temp_rec)
+    LET sqlString = temp_rec.toSQLString()
+    LET jsonArray = SQLHelper.runSQL(sqlString)
 
     # TODO: parse query to get table names and check authorization?
     IF NOT authorizationCheck("sql", UserScopes.cFetchOperation) THEN
         RETURN jsonArray
     END IF
-
---    {
---      "sql_command": "SELECT * FROM xyz WHERE col1 = ? AND col2 = ?",
---      "parameters": [
---        "A",
---        "01/01/2022"
---       ],
---      "limit": 100,
---      "offset": 200
---    }
-
-    #VAR paramList util.JSONArray = jsonObj.get("param")
-    {VAR paramListStr DYNAMIC ARRAY OF STRING
-    VAR i = 0
-    FOR i=1 TO paramList.getLength()
-        LET paramListStr[paramListStr.getLength()+1] = paramList.get(i)
-    END FOR}
-
-    #LET jsonArray = getQuery(query, paramList)
-
     RETURN jsonArray
 
 END FUNCTION #getQueryResults
@@ -398,20 +384,14 @@ PRIVATE FUNCTION getQueryOperation(query STRING)
     LET qTrim = query.toLowerCase().trimLeftWhiteSpace()
     LET qTrim = qTrim.split('[ \t\n\r]')[1]
     CASE qTrim
-    WHEN 'select'
-        LET opStr = UserScopes.cFetchOperation
-    WHEN 'insert'
-        LET opStr = UserScopes.cInsertOperation
-    WHEN 'update'
-        LET opStr = UserScopes.cUpdateOperation
-    WHEN 'delete'
-        LET opStr = UserScopes.cDeleteOperation
-    OTHERWISE
-        LET opStr = 'UNKNOWN'
+        WHEN 'select'
+            LET opStr = UserScopes.cFetchOperation
+        OTHERWISE
+            LET opStr = 'UNKNOWN'
     END CASE
-    
+
     RETURN opStr
-    
+
 END FUNCTION
 
 PRIVATE FUNCTION getSqlOperator(restOperator STRING)
@@ -420,7 +400,9 @@ PRIVATE FUNCTION getSqlOperator(restOperator STRING)
 
 END FUNCTION #getSqlOperator
 
-PRIVATE FUNCTION authorizationCheck(tabname STRING, operation STRING) RETURNS BOOLEAN
+PRIVATE FUNCTION authorizationCheck(
+    tabname STRING, operation STRING)
+    RETURNS BOOLEAN
     DEFINE userScopes UserScopes.TUserScopes
 
     IF NOT useScopes THEN
@@ -458,7 +440,8 @@ FUNCTION setRestError(respCode STRING, tableName STRING)
             CALL com.WebServiceEngine.SetRestError(httpStatus, notFoundError)
         WHEN _ERR_TABLE_DNE
             LET httpStatus = _ERR_NOT_FOUND
-            LET notFoundError.respMessage = SFMT("Table %1 does not exist", tableName)
+            LET notFoundError.respMessage =
+                SFMT("Table %1 does not exist", tableName)
             CALL com.WebServiceEngine.SetRestError(httpStatus, notFoundError)
         WHEN _ERR_TABLE_EMPTY
             LET httpStatus = _ERR_INTERNAL
@@ -467,7 +450,8 @@ FUNCTION setRestError(respCode STRING, tableName STRING)
             CALL com.WebServiceEngine.SetRestError(httpStatus, internalError)
         WHEN _ERR_ARG_CNT_MISMATCH
             LET httpStatus = _ERR_BAD_REQUEST
-            LET badRequestError.respMessage = SFMT("Argument count mismatch", tableName)
+            LET badRequestError.respMessage =
+                SFMT("Argument count mismatch", tableName)
             CALL com.WebServiceEngine.SetRestError(httpStatus, badRequestError)
         OTHERWISE # Unknown, assume internal server error since we missed a case
             LET httpStatus = _ERR_INTERNAL

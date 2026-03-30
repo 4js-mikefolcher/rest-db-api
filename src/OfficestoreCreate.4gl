@@ -7,9 +7,9 @@ IMPORT os
 
 PUBLIC FUNCTION create_officestore_database()
 
-	 CALL db_drop_tables()
+    CALL db_drop_tables()
     CALL db_create_tables()
-	 CALL db_load_data()
+    CALL db_load_data()
 
 END FUNCTION
 
@@ -172,59 +172,55 @@ END FUNCTION
 #+ Drop all tables from database.
 PRIVATE FUNCTION db_drop_tables()
 
-	WHENEVER ERROR CONTINUE
+    WHENEVER ERROR CONTINUE
 
-	EXECUTE IMMEDIATE "DROP TABLE signon"
-	EXECUTE IMMEDIATE "DROP TABLE seqreg"
-	EXECUTE IMMEDIATE "DROP TABLE orderstatus"
-	EXECUTE IMMEDIATE "DROP TABLE lineitem"
-	EXECUTE IMMEDIATE "DROP TABLE orders"
-	EXECUTE IMMEDIATE "DROP TABLE inventory"
-	EXECUTE IMMEDIATE "DROP TABLE item"
+    EXECUTE IMMEDIATE "DROP TABLE signon"
+    EXECUTE IMMEDIATE "DROP TABLE seqreg"
+    EXECUTE IMMEDIATE "DROP TABLE orderstatus"
+    EXECUTE IMMEDIATE "DROP TABLE lineitem"
+    EXECUTE IMMEDIATE "DROP TABLE orders"
+    EXECUTE IMMEDIATE "DROP TABLE inventory"
+    EXECUTE IMMEDIATE "DROP TABLE item"
 
-	EXECUTE IMMEDIATE "DROP TABLE account"
-	EXECUTE IMMEDIATE "DROP TABLE product"
+    EXECUTE IMMEDIATE "DROP TABLE account"
+    EXECUTE IMMEDIATE "DROP TABLE product"
 
-
-	EXECUTE IMMEDIATE "DROP TABLE category"
-	EXECUTE IMMEDIATE "DROP TABLE country"
-	EXECUTE IMMEDIATE "DROP TABLE supplier"
+    EXECUTE IMMEDIATE "DROP TABLE category"
+    EXECUTE IMMEDIATE "DROP TABLE country"
+    EXECUTE IMMEDIATE "DROP TABLE supplier"
 
 END FUNCTION
 
 PRIVATE FUNCTION db_load_data()
-	DEFINE tableList DYNAMIC ARRAY OF STRING = [
-		"supplier",
-		"country",
-		"category",
-		"product",
-		"account",
-		"item",
-		"inventory",
-		"orders",
-		"lineitem",
-		"orderstatus",
-		"seqreg",
-		"signon"
-	]
-	DEFINE idx INTEGER
+    DEFINE tableList DYNAMIC ARRAY OF STRING =
+        ["supplier",
+            "country",
+            "category",
+            "product",
+            "account",
+            "item",
+            "inventory",
+            "orders",
+            "lineitem",
+            "orderstatus",
+            "seqreg",
+            "signon"]
+    DEFINE idx INTEGER
 
-	FOR idx = 1 TO tableList.getLength()
-		CALL db_load_table(tableList[idx])
-	END FOR
+    FOR idx = 1 TO tableList.getLength()
+        CALL db_load_table(tableList[idx])
+    END FOR
 
 END FUNCTION #db_load_data
 
-PRIVATE FUNCTION db_load_table(tablename STRING) RETURNS ()
-	DEFINE sqlText STRING
-	DEFINE filename STRING
+PRIVATE FUNCTION db_load_table(tablename STRING) RETURNS()
+    DEFINE sqlText STRING
+    DEFINE filename STRING
 
-	LET filename = SFMT("..%1data%1%2.unl", os.Path.separator(), tablename)
+    LET filename = SFMT("..%1data%1%2.unl", os.Path.separator(), tablename)
 
-	LET sqlText = SFMT("INSERT INTO %1", tablename)
-	DISPLAY SFMT("File name: %1 SQL: %2", filename, sqlText)
-	LOAD FROM filename sqlText
+    LET sqlText = SFMT("INSERT INTO %1", tablename)
+    DISPLAY SFMT("File name: %1 SQL: %2", filename, sqlText)
+    LOAD FROM filename sqlText
 
 END FUNCTION #db_load_table
-
-

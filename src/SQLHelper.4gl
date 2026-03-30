@@ -59,7 +59,8 @@ PUBLIC FUNCTION getTableRecords(
                 LET jsonObj = util.JSONObject.create()
                 FOR lIndex = 1 TO sqlObj.getResultCount()
                     CALL jsonObj.put(
-                        sqlObj.getResultName(lIndex), sqlObj.getResultValue(lIndex))
+                        sqlObj.getResultName(lIndex),
+                        sqlObj.getResultValue(lIndex))
                 END FOR
 
                 #Add the JSON Object to the JSON Array
@@ -106,7 +107,9 @@ PUBLIC FUNCTION getTableQuery(
     #Initialize the SQL Statement and JSON Array
     LET lSQLSelect = SFMT("SELECT * FROM %1 WHERE", tableName)
     FOR colIdx = 1 TO colName.getLength()
-        LET lSQLSelect = lSQLSelect, SFMT(" (%1 %2 ?) AND", colName[colIdx], operator[colIdx])
+        LET lSQLSelect =
+            lSQLSelect,
+            SFMT(" (%1 %2 ?) AND", colName[colIdx], operator[colIdx])
     END FOR
     LET lSQLSelect = lSQLSelect.trimRight(), " 1=1"
 
@@ -120,7 +123,8 @@ PUBLIC FUNCTION getTableQuery(
 
 END FUNCTION
 
-PUBLIC FUNCTION getQuery(lQuery STRING, paramList util.JSONArray)
+PUBLIC FUNCTION getQuery(
+    lQuery STRING, paramList util.JSONArray)
     RETURNS util.JSONArray
 
     DEFINE sqlObj base.SqlHandle
@@ -150,7 +154,8 @@ PUBLIC FUNCTION getQuery(lQuery STRING, paramList util.JSONArray)
                 LET jsonObj = util.JSONObject.create()
                 FOR lIndex = 1 TO sqlObj.getResultCount()
                     CALL jsonObj.put(
-                        sqlObj.getResultName(lIndex), sqlObj.getResultValue(lIndex))
+                        sqlObj.getResultName(lIndex),
+                        sqlObj.getResultValue(lIndex))
                 END FOR
                 #Add the JSON Object to the JSON Array
                 LET lCount = lCount + 1
@@ -205,158 +210,6 @@ PUBLIC FUNCTION getTableRecordCount(tableName STRING) RETURNS INTEGER
 
 END FUNCTION
 
-##############################################################################################
-#+
-#+ insertFromJSON Inserts into the specified table using the JSONObject for the values
-#+
-##############################################################################################
-PUBLIC FUNCTION insertFromJSON(tableName STRING, jsonObj util.JSONObject) RETURNS INTEGER
-    DEFINE lErrorStatus INTEGER = 0
-    DEFINE lInsertSQL STRING = "INSERT INTO %1 (%2) VALUES(%3)"
-    DEFINE lColList STRING
-    DEFINE lValueList STRING
-    DEFINE lIndex INTEGER = 0
-    DEFINE sqlObj base.SqlHandle
-    DEFINE aColNames DYNAMIC ARRAY OF STRING
-
-    WHENEVER ANY ERROR CALL errorHandler
-
-    #Parse the list for the number and name of columns
-    CALL aColNames.clear()
-    FOR lIndex = 1 TO jsonObj.getLength()
-        IF lIndex == 1 THEN
-            LET lColList = jsonObj.name(lIndex)
-            LET lValueList = "?"
-        ELSE
-            LET lColList = SFMT("%1,%2", lColList, jsonObj.name(lIndex))
-            LET lValueList = SFMT("%1,?", lValueList)
-        END IF
-        CALL aColNames.appendElement()
-        LET aColNames[lIndex] = jsonObj.name(lIndex)
-    END FOR
-
-    #Initialize the SQL Statement and SQL Handler
-    LET lInsertSQL = SFMT(lInsertSQL, tableName, lColList, lValueList)
-    LET sqlObj = base.SqlHandle.create()
-    TRY
-        #Build the SQL Handler
-        BEGIN WORK
-        CALL sqlObj.prepare(lInsertSQL)
-        CALL sqlObj.open()
-        FOR lIndex = 1 TO aColNames.getLength()
-            CALL sqlObj.setParameter(lIndex, jsonObj.get(aColNames[lIndex]))
-        END FOR
-        CALL sqlObj.put()
-        CALL sqlObj.flush()
-        CALL sqlObj.close()
-        COMMIT WORK
-    CATCH
-        LET lErrorStatus = 500
-    END TRY
-
-    RETURN lErrorStatus
-
-END FUNCTION
-
-##############################################################################################
-#+
-#+ updateFromJSON Updates the specified table using the JSONObject for the new values
-#+ colName is the column name used in the where clause
-#+ colValue is the column value used int he where clause
-#+
-##############################################################################################
-PUBLIC FUNCTION updateFromJSON(
-    tableName STRING, colName STRING, colValue STRING, jsonObj util.JSONObject)
-    RETURNS INTEGER
-    DEFINE lErrorStatus INTEGER = 0
-    DEFINE lUpdateSQL STRING = "UPDATE %1 SET %2 WHERE %3 = ?"
-    DEFINE lSetList STRING
-    DEFINE lIndex INTEGER = 0
-    DEFINE lintX INTEGER = 0
-    DEFINE sqlObj base.SqlHandle
-    DEFINE aColNames DYNAMIC ARRAY OF STRING
-    DEFINE jsonColName STRING
-
-    WHENEVER ANY ERROR CALL errorHandler
-
-    #Parse the list for the number and name of column
-    CALL aColNames.clear()
-    FOR lIndex = 1 TO jsonObj.getLength()
-        LET jsonColName = jsonObj.name(lIndex)
-        IF jsonColName == colName THEN
-            #Do not update the column/value pair used in the where clause
-            CONTINUE FOR
-        END IF
-        IF lSetList.getLength() == 0 THEN
-            LET lSetList = SFMT("%1 = ?", jsonColName)
-        ELSE
-            LET lSetList = SFMT("%1, %2 = ?", lSetList, jsonColName)
-        END IF
-        CALL aColNames.appendElement()
-        LET lintX = aColNames.getLength()
-        LET aColNames[lintX] = jsonColName
-    END FOR
-
-    #Initialize the SQL Statement and SQL Handler
-    LET lUpdateSQL = SFMT(lUpdateSQL, tableName, lSetList, colName)
-    LET sqlObj = base.SqlHandle.create()
-    TRY
-        #Build the SQL Handler
-        BEGIN WORK
-        CALL sqlObj.prepare(lUpdateSQL)
-        FOR lIndex = 1 TO aColNames.getLength()
-            CALL sqlObj.setParameter(lIndex, jsonObj.get(aColNames[lIndex]))
-        END FOR
-        #Set the where parameter last
-        LET lIndex = aColNames.getLength() + 1
-        CALL sqlObj.setParameter(lIndex, colValue)
-        CALL sqlObj.execute()
-        CALL sqlObj.close()
-        COMMIT WORK
-    CATCH
-        LET lErrorStatus = 500
-    END TRY
-
-    RETURN lErrorStatus
-
-END FUNCTION
-
-##############################################################################################
-#+
-#+ deleteRecordWithColumnValue Deletes from the specified table
-#+ colName is the column name used in the where clause
-#+ colValue is the column value used int he where clause
-#+
-##############################################################################################
-PUBLIC FUNCTION deleteRecordWithColumnValue(
-    tableName STRING, colName STRING, colValue STRING)
-    RETURNS INTEGER
-
-    DEFINE lErrorStatus INTEGER = 0
-    DEFINE lDeleteSQL STRING = "DELETE FROM %1 WHERE %2 = ?"
-    DEFINE sqlObj base.SqlHandle
-
-    WHENEVER ANY ERROR CALL errorHandler
-
-    #Initialize the SQL Statement and SQL Handler
-    LET lDeleteSQL = SFMT(lDeleteSQL, tableName, colName)
-    LET sqlObj = base.SqlHandle.create()
-    TRY
-        #Build the SQL Handler for delete
-        BEGIN WORK
-        CALL sqlObj.prepare(lDeleteSQL)
-        CALL sqlObj.setParameter(1, colValue)
-        CALL sqlObj.execute()
-        CALL sqlObj.close()
-        COMMIT WORK
-    CATCH
-        LET lErrorStatus = 500
-    END TRY
-
-    RETURN lErrorStatus
-
-END FUNCTION
-
 PUBLIC FUNCTION getTableSchema(tableName STRING) RETURNS DICTIONARY OF STRING
     DEFINE schemaList DICTIONARY OF STRING
     DEFINE idx INTEGER
@@ -386,4 +239,48 @@ PRIVATE FUNCTION errorHandler()
     CALL errorlog(SFMT("Error Code: %1", status))
     CALL errorlog(base.Application.getStackTrace())
     EXIT PROGRAM -1
+END FUNCTION
+##############################################################################################
+#+
+#+ runSQL
+#+ Executes the provided SQL statement
+#+
+##############################################################################################
+PUBLIC FUNCTION runSQL(lSQL STRING) RETURNS util.JSONArray
+    DEFINE sqlObj base.SqlHandle
+    DEFINE jsonArray util.JSONArray
+    DEFINE jsonObj util.JSONObject
+    DEFINE lIndex INTEGER = 0
+    DEFINE lCount INTEGER = 0
+    DEFINE lMoreRecords BOOLEAN = TRUE
+
+    LET jsonArray = util.JSONArray.create()
+    TRY
+        LET sqlObj = base.SqlHandle.create()
+        CALL sqlObj.prepare(lSQL)
+        CALL sqlObj.open()
+        WHILE lMoreRecords
+            #Fetch each record
+            CALL sqlObj.fetch()
+            IF sqlca.sqlcode == NOTFOUND THEN
+                LET lMoreRecords = FALSE
+            ELSE
+                #Build the JSON Object
+                LET jsonObj = util.JSONObject.create()
+                FOR lIndex = 1 TO sqlObj.getResultCount()
+                    CALL jsonObj.put(
+                        sqlObj.getResultName(lIndex),
+                        sqlObj.getResultValue(lIndex))
+                END FOR
+                #Add the JSON Object to the JSON Array
+                LET lCount = lCount + 1
+                CALL jsonArray.put(lCount, jsonObj)
+            END IF
+        END WHILE
+        CALL sqlObj.close()
+    CATCH
+        LET jsonArray = NULL
+    END TRY
+
+    RETURN jsonArray
 END FUNCTION

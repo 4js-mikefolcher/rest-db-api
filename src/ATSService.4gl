@@ -1,5 +1,5 @@
 ##############################################################################################
-# custdemoService.4gl provides web service interface for all the tables in the 
+# custdemoService.4gl provides web service interface for all the tables in the
 #  custdemo database
 ##############################################################################################
 
@@ -7,20 +7,20 @@ IMPORT com
 IMPORT FGL ServiceHelper
 
 MAIN
-  DEFINE lMessage STRING
+    DEFINE lMessage STRING
 
-  DATABASE fx
+    DATABASE fx
 
-  CALL com.WebServiceEngine.RegisterRestService("ServiceHelper","ats")
+    CALL com.WebServiceEngine.RegisterRestService("ServiceHelper", "ats")
 
-  CALL startlog("ATSService.log")
+    CALL startlog("ATSService.log")
 
-  DISPLAY "Server started"
+    DISPLAY "Server started"
 
-  #Set useScopes to false to disable authorization
-  LET ServiceHelper.useScopes = FALSE
+    #Set useScopes to false to disable authorization
+    LET ServiceHelper.useScopes = FALSE
 
-  LET lMessage = ServiceHelper.startService()
-  DISPLAY lMessage
+    LET lMessage = ServiceHelper.startService()
+    DISPLAY lMessage
 
 END MAIN

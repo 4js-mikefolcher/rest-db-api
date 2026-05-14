@@ -1,3 +1,5 @@
+PACKAGE com.fourjs.restdblib
+
 PUBLIC CONSTANT cFetchOperation = "fetch"
 
 PUBLIC TYPE TUserScopes RECORD

@@ -4,22 +4,21 @@
 ##############################################################################################
 
 IMPORT com
-IMPORT FGL ServiceHelper
+IMPORT FGL com.fourjs.restdblib.ServiceHelper
 
 MAIN
     DEFINE lMessage STRING
+    CONNECT TO "northwind@localhost+driver='dbmpgs'" USER "nwuser" USING "fourjs123"
 
-    DATABASE fx
+    CALL com.WebServiceEngine.RegisterRestService("com.fourjs.restdblib.ServiceHelper", "northwind")
 
-    CALL com.WebServiceEngine.RegisterRestService("ServiceHelper", "ats")
+    CALL startlog("NorthwindService.log")
 
-    CALL startlog("ATSService.log")
+    IF arg_val(1) == "--debug" THEN
+        LET ServiceHelper.useScopes = FALSE
+    END IF
 
     DISPLAY "Server started"
-
-    #Set useScopes to false to disable authorization
-    LET ServiceHelper.useScopes = FALSE
-
     LET lMessage = ServiceHelper.startService()
     DISPLAY lMessage
 

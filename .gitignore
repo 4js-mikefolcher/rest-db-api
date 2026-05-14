@@ -29,6 +29,7 @@ replay_pid*
 *.4pwvs
 *.42?
 *.log
+*.4pdb
 .DS_Store
 
 # Genero Local file extension
@@ -39,6 +40,7 @@ bin/
 build/
 distbin/
 database/
+.vscode/
 
 # Genero Source code documentation
 *.html

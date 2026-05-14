@@ -3,7 +3,7 @@
 #  officestore database
 ##############################################################################################
 IMPORT com
-IMPORT FGL ServiceHelper
+IMPORT FGL com.fourjs.restdblib.ServiceHelper
 IMPORT FGL OfficestoreCreate
 
 MAIN

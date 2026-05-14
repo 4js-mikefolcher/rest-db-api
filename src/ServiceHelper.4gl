@@ -2,11 +2,14 @@
 # serverHelper.4gl provides functions to define URI endpoints for GET, POST, PUT, and DELETE
 # without relying on the database schema.
 ##############################################################################################
+PACKAGE com.fourjs.restdblib
+
 IMPORT com
 IMPORT util
-IMPORT FGL SQLHelper
-IMPORT FGL UserScopes
-IMPORT FGL jsonParser
+
+IMPORT FGL com.fourjs.restdblib.SQLHelper
+IMPORT FGL com.fourjs.restdblib.UserScopes
+IMPORT FGL com.fourjs.restdblib.jsonParser
 
 PUBLIC DEFINE internalError
     RECORD ATTRIBUTE(WSError = "Internal Server Error",
@@ -122,11 +125,11 @@ PUBLIC FUNCTION getAllRecords(
 
     DEFINE jsonArray util.JSONArray
 
-    IF NOT authorizationCheck(tableName, UserScopes.cFetchOperation) THEN
+    IF NOT authorizationCheck(tableName, cFetchOperation) THEN
         RETURN jsonArray
     END IF
 
-    LET jsonArray = SQLHelper.getTableRecords(tableName, -1, -1)
+    LET jsonArray = getTableRecords(tableName, -1, -1)
 
     IF jsonArray IS NULL THEN
         CALL setRestError(_ERR_TABLE_DNE, tableName)
@@ -154,11 +157,11 @@ PUBLIC FUNCTION getRecordCount(
 
     DEFINE lCount INTEGER
 
-    IF NOT authorizationCheck(tableName, UserScopes.cFetchOperation) THEN
+    IF NOT authorizationCheck(tableName, cFetchOperation) THEN
         RETURN lCount
     END IF
 
-    LET lCount = SQLHelper.getTableRecordCount(tableName)
+    LET lCount = getTableRecordCount(tableName)
 
     IF lCount IS NULL THEN
         CALL setRestError(_ERR_INTERNAL, tableName)
@@ -187,11 +190,11 @@ PUBLIC FUNCTION getSchema(
     DEFINE jsonObj util.JSONObject
     DEFINE schemaList DICTIONARY OF STRING
 
-    IF NOT authorizationCheck(tableName, UserScopes.cFetchOperation) THEN
+    IF NOT authorizationCheck(tableName, cFetchOperation) THEN
         RETURN jsonObj
     END IF
 
-    LET schemaList = SQLHelper.getTableSchema(tableName)
+    LET schemaList = getTableSchema(tableName)
 
     IF schemaList.getLength() == 0 THEN
         CALL setRestError(_ERR_NOT_FOUND, tableName)
@@ -218,11 +221,11 @@ PUBLIC FUNCTION getRecordsWithLimit(
 
     DEFINE jsonArray util.JSONArray
 
-    IF NOT authorizationCheck(tableName, UserScopes.cFetchOperation) THEN
+    IF NOT authorizationCheck(tableName, cFetchOperation) THEN
         RETURN jsonArray
     END IF
 
-    LET jsonArray = SQLHelper.getTableRecords(tableName, recLimit, -1)
+    LET jsonArray = getTableRecords(tableName, recLimit, -1)
 
     IF jsonArray IS NULL THEN
         CALL setRestError(_ERR_INTERNAL, tableName)
@@ -256,11 +259,11 @@ PUBLIC FUNCTION getRecordsWithLimitOffset(
 
     DEFINE jsonArray util.JSONArray
 
-    IF NOT authorizationCheck(tableName, UserScopes.cFetchOperation) THEN
+    IF NOT authorizationCheck(tableName, cFetchOperation) THEN
         RETURN jsonArray
     END IF
 
-    LET jsonArray = SQLHelper.getTableRecords(tableName, recLimit, recOffset)
+    LET jsonArray = getTableRecords(tableName, recLimit, recOffset)
 
     IF jsonArray IS NULL THEN
         CALL setRestError(_ERR_INTERNAL, NULL)
@@ -296,7 +299,7 @@ PUBLIC FUNCTION getRecordsQuery(
     DEFINE colList, valList, opListREST, opListSQL DYNAMIC ARRAY OF STRING
     DEFINE i, argCnt INTEGER
 
-    IF NOT authorizationCheck(tableName, UserScopes.cFetchOperation) THEN
+    IF NOT authorizationCheck(tableName, cFetchOperation) THEN
         RETURN jsonArray
     END IF
 
@@ -313,7 +316,7 @@ PUBLIC FUNCTION getRecordsQuery(
     END IF
     # If no arguments, return all for table; otherwise loop through args
     IF argCnt < 1 THEN
-        LET jsonArray = SQLHelper.getTableRecords(tableName, -1, -1)
+        LET jsonArray = getTableRecords(tableName, -1, -1)
     END IF
     FOR i = 1 TO argCnt
         LET colList[i] = colList[i].trimWhiteSpace()
@@ -324,8 +327,7 @@ PUBLIC FUNCTION getRecordsQuery(
         END IF
     END FOR
     IF colList.getLength() > 0 THEN
-        LET jsonArray =
-            SQLHelper.getTableQuery(tableName, colList, valList, opListSQL)
+        LET jsonArray = getTableQuery(tableName, colList, valList, opListSQL)
     END IF
 
     IF jsonArray IS NULL THEN
@@ -352,30 +354,18 @@ PUBLIC FUNCTION getQueryResults(
     RETURNS util.JSONArray ATTRIBUTES(WSMedia = "application/json")
     DEFINE jsonArray util.JSONArray
     DEFINE sqlString STRING
-    DEFINE temp_rec jsonParser.t_jsonBody
+    DEFINE temp_rec TJsonBody
     CALL jsonObj.toFGL(temp_rec)
     LET sqlString = temp_rec.toSQLString()
-    LET jsonArray = SQLHelper.runSQL(sqlString)
+    LET jsonArray = runSQL(sqlString)
 
     # TODO: parse query to get table names and check authorization?
-    IF NOT authorizationCheck("sql", UserScopes.cFetchOperation) THEN
+    IF NOT authorizationCheck("sql", cFetchOperation) THEN
         RETURN jsonArray
     END IF
     RETURN jsonArray
 
 END FUNCTION #getQueryResults
-
-{
-PRIVATE FUNCTION reportIfResultsEmpty(jsonArray util.JSONArray param)
-    IF jsonArray IS NULL THEN
-        CALL setRestError(_ERR_INTERNAL, NULL)
-    ELSE
-        IF jsonArray.getLength() == 0 THEN
-            CALL setRestError(_ERR_NOT_FOUND, NULL)
-        END IF
-    END IF
-END FUNCTION #reportIfResultsEmpty
-}
 
 PRIVATE FUNCTION getQueryOperation(query STRING)
     DEFINE qTrim STRING
@@ -385,7 +375,7 @@ PRIVATE FUNCTION getQueryOperation(query STRING)
     LET qTrim = qTrim.split('[ \t\n\r]')[1]
     CASE qTrim
         WHEN 'select'
-            LET opStr = UserScopes.cFetchOperation
+            LET opStr = cFetchOperation
         OTHERWISE
             LET opStr = 'UNKNOWN'
     END CASE
@@ -403,7 +393,7 @@ END FUNCTION #getSqlOperator
 PRIVATE FUNCTION authorizationCheck(
     tabname STRING, operation STRING)
     RETURNS BOOLEAN
-    DEFINE userScopes UserScopes.TUserScopes
+    DEFINE userScopes TUserScopes
 
     IF NOT useScopes THEN
         RETURN TRUE

@@ -1,5 +1,7 @@
+PACKAGE com.fourjs.restdblib
+
 IMPORT util
-PUBLIC TYPE t_jsonBody RECORD
+PUBLIC TYPE TJsonBody RECORD
     selectList DYNAMIC ARRAY ATTRIBUTES(json_name = "select") OF STRING,
     tableList DYNAMIC ARRAY ATTRIBUTES(json_name = "table") OF STRING,
     whereList DYNAMIC ARRAY ATTRIBUTES(json_name = "where") OF RECORD
@@ -14,7 +16,7 @@ PUBLIC TYPE t_jsonBody RECORD
     END RECORD
 END RECORD
 
-PUBLIC FUNCTION (temp_rec t_jsonBody) toSQLString() RETURNS STRING
+PUBLIC FUNCTION (temp_rec TJsonBody) toSQLString() RETURNS STRING
     DEFINE sqlString STRING
     DEFINE i INTEGER
     LET sqlString = "SELECT "

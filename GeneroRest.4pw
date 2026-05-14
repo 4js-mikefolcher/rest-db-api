@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<Project defaultApplication="-247091234" gstVersion="50102" version="3.7">
+<Project defaultApplication="1034483440" gstVersion="60003" version="3.7">
   <Settings>
     <DynamicProperties version="4">
-      <DynamicProperty initialValue="false" isDefaultInherited="false" isHidden="false" label="Firebase-analytics" name="firebase" readOnly="false" type="BOOLEAN"/>
+      <DynamicProperty editorInfo="alwaysUpdate:true" initialValue="false" isDefaultInherited="false" isHidden="false" label="Firebase-analytics" name="firebase" readOnly="false" type="BOOLEAN"/>
       <DynamicProperty description="Accent color (Android 5.0 and later)" initialValue="#9575CD" isDefaultInherited="false" isHidden="false" label="Accent color" name="gma-accent-color" readOnly="false" type="COLOR"/>
       <DynamicProperty description="Action bar text color (Android 5.0 and later)" initialValue="#EBEBEB" isDefaultInherited="false" isHidden="false" label="Action bar text color" name="gma-actionbar-color" readOnly="false" type="COLOR"/>
       <DynamicProperty initialValue="" isDefaultInherited="false" isHidden="false" label="Background explanation" name="gma-background-explanation" readOnly="false" type="TEXT"/>
@@ -12,7 +12,6 @@
       <DynamicProperty description="Primary color (Android 5.0 and later)" initialValue="#5E35B1" isDefaultInherited="false" isHidden="false" label="Primary color" name="gma-primary-color" readOnly="false" type="COLOR"/>
       <DynamicProperty description="Primary dark color (Android 5.0 and later)" initialValue="#5E35B1" isDefaultInherited="false" isHidden="false" label="Primary dark color" name="gma-primary-dark-color" readOnly="false" type="COLOR"/>
       <DynamicProperty description="Primary text color (Android 5.0 and later)" initialValue="#000000" isDefaultInherited="false" isHidden="false" label="Primary text color" name="gma-primaryText-color" readOnly="false" type="COLOR"/>
-      <DynamicProperty initialValue="false" isDefaultInherited="false" isHidden="false" label="Short background lifetime" name="gma-short-background-lifetime" readOnly="false" type="BOOLEAN"/>
       <DynamicProperty description="Window backround color (Android 5.0 and later)" initialValue="#ffffff" isDefaultInherited="false" isHidden="false" label="Window background color" name="gma-windowBackground-color" readOnly="false" type="COLOR"/>
       <DynamicProperty description="Cordova plugins" editorInfo="isDynamic:true;title:Cordova;description:Cordova plugins;icon:checkbox_checked" initialValue="" isDefaultInherited="false" isHidden="false" label="Cordova Plugins" name="gmi-cordova" readOnly="false" type="MULTIPLEBOOLEAN"/>
       <DynamicProperty description="High-DPI Icon (72x72 px) path" editorInfo="filters:*.png;openDirDialog:true;replaceDocPath:$(ProjectDir)" initialValue="" isDefaultInherited="false" isHidden="false" label="Icon-hdpi (72x72 px)" name="icon-hdpi" readOnly="false" type="FILE"/>
@@ -66,26 +65,27 @@
       <DynamicPropertyGroup collapsed="false" description="iOS" label="iOS" name="iOSGroup" properties="launchScreen;launchScreen1136x640;launchScreen750x1334;launchScreen1334x750;launchScreen1242x2208;launchScreen2208x1242;launchScreen1125x2436;launchScreen2436x1125;launchScreen768x1024;launchScreen1024x768;launchScreen1536x2048;launchScreen2048x1536;launchScreen2224x1668;launchScreen1668x2224;launchScreen2048x2732;launchScreen2732x2048;launchScreenXib;icon29x29;icon40x40;icon58x58;icon60x60;icon76x76;icon80x80;icon87x87;icon120x120;icon152x152;icon167x167;icon180x180;icon1024x1024;required;gmi-cordova"/>
     </DynamicProperties>
     <NodeInfos version="1">
-      <NodeInfo mimeType="pm/package" properties="packageId;packageLabel;packageVersion;mainModule;packageVersionName;resources;launchScreen;launchScreen1136x640;launchScreen750x1334;launchScreen1334x750;launchScreen1242x2208;launchScreen2208x1242;launchScreen1125x2436;launchScreen2436x1125;launchScreen768x1024;launchScreen1024x768;launchScreen1536x2048;launchScreen2048x1536;launchScreen2224x1668;launchScreen1668x2224;launchScreen2048x2732;launchScreen2732x2048;launchScreenXib;icon29x29;icon40x40;icon58x58;icon60x60;icon76x76;icon80x80;icon87x87;icon120x120;icon152x152;icon167x167;icon180x180;icon1024x1024;gma-primary-color;gma-primary-dark-color;gma-accent-color;gma-actionbar-color;gma-primaryText-color;gma-windowBackground-color;gma-navigationBarBackground-color;icon-ldpi;icon-mdpi;icon-hdpi;icon-xhdpi;icon-xxhdpi;status-icon-mdpi;status-icon-hdpi;status-icon-xhdpi;permissions;required;gma-foreground-services;gma-background-explanation;firebase;gma-cordova;gmi-cordova;gma-short-background-lifetime"/>
+      <NodeInfo mimeType="pm/package" properties="packageId;packageLabel;packageVersion;mainModule;packageVersionName;resources;launchScreen;launchScreen1136x640;launchScreen750x1334;launchScreen1334x750;launchScreen1242x2208;launchScreen2208x1242;launchScreen1125x2436;launchScreen2436x1125;launchScreen768x1024;launchScreen1024x768;launchScreen1536x2048;launchScreen2048x1536;launchScreen2224x1668;launchScreen1668x2224;launchScreen2048x2732;launchScreen2732x2048;launchScreenXib;icon29x29;icon40x40;icon58x58;icon60x60;icon76x76;icon80x80;icon87x87;icon120x120;icon152x152;icon167x167;icon180x180;icon1024x1024;gma-primary-color;gma-primary-dark-color;gma-accent-color;gma-actionbar-color;gma-primaryText-color;gma-windowBackground-color;gma-navigationBarBackground-color;icon-ldpi;icon-mdpi;icon-hdpi;icon-xhdpi;icon-xxhdpi;status-icon-mdpi;status-icon-hdpi;status-icon-xhdpi;permissions;required;gma-foreground-services;gma-background-explanation;firebase;gma-cordova;gmi-cordova"/>
     </NodeInfos>
   </Settings>
   <LanguageList version="1.0"/>
   <PlatformList version="1.0"/>
-  <Group id="-1574633226" label="App" language="Genero (no link)">
-    <Library binaryName="RestService" id="-965637885" label="RestService">
-      <VirtualFolder label="ATS">
-        <Configuration binaryName="ATSService" id="-247091234" label="ATSService"/>
-        <File filePath="src/ATSService.4gl"/>
-      </VirtualFolder>
+  <Group environment="dirlist:FGLLDPATH=$(ProjectDir);$(FGLLDPATH)" id="-1574633226" label="App" language="Genero (no link)">
+    <Library binaryName="restdblib" id="1526070589" label="restdblib" targetDirectory="$(ProjectDir)">
+      <File filePath="src/JsonParser.4gl"/>
+      <File filePath="src/ServiceHelper.4gl"/>
+      <File filePath="src/SQLHelper.4gl"/>
+      <File filePath="src/UserScopes.4gl"/>
+    </Library>
+    <Library binaryName="RestExamples" id="-965637885" label="RestExamples">
       <VirtualFolder label="Custdemo">
         <Configuration binaryName="CustdemoService" commandLineArguments="--debug" id="1034483440" label="CustdemoService"/>
         <File filePath="src/CustdemoCreate.4gl"/>
         <File filePath="src/CustdemoService.4gl"/>
       </VirtualFolder>
-      <VirtualFolder label="Library">
-        <File filePath="src/ServiceHelper.4gl"/>
-        <File filePath="src/SQLHelper.4gl"/>
-        <File filePath="src/UserScopes.4gl"/>
+      <VirtualFolder label="Northwind">
+        <Configuration binaryName="NorthwindService" commandLineArguments="--debug" id="1764202900" label="NorthwindService"/>
+        <File filePath="src/NorthwindService.4gl"/>
       </VirtualFolder>
       <VirtualFolder label="Officestore">
         <Configuration binaryName="OfficestoreService" commandLineArguments="--debug" id="-1201661763" label="OfficestoreService"/>

@@ -2,6 +2,8 @@
 # sqlHelper.4gl provides functions to perform generic SQL commands SELECT, INSERT, UPDATE,
 #  and DELETE
 ##############################################################################################
+PACKAGE com.fourjs.restdblib
+
 IMPORT util
 
 ##############################################################################################

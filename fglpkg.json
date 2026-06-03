@@ -1,12 +1,10 @@
 {
   "name": "restdblib",
-  "version": "1.0.0",
-  "root": "com/fourjs/restdblib",
+  "version": "1.2.0",
   "description": "Genero BDL library for creating RESTful web services",
   "author": "mifo@4js.com",
   "license": "4Js Usage License",
-  "dependencies": {
-    "fgl": {},
-    "java": []
-  }
+  "repository": "https://github.com/4js-mikefolcher/rest-db-api",
+  "dependencies": {},
+  "root": "com/fourjs/restdblib"
 }

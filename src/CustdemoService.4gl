@@ -12,9 +12,12 @@ MAIN
     CONNECT TO ":memory:+driver='dbmsqt'"
     CALL CustdemoCreate.create_custdemo_database()
 
-    CALL com.WebServiceEngine.RegisterRestService("ServiceHelper", "custdemo")
-
     CALL startlog("custdemoService.log")
+
+    VAR success = ServiceHelper.registerService("custdemo")
+    IF NOT success THEN
+        EXIT PROGRAM -1
+    END IF
 
     IF arg_val(1) == "--debug" THEN
         LET ServiceHelper.useScopes = FALSE

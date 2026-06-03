@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "genero": {
+      "type": "http",
+      "url": "https://service.generointelligence.ai/mcp"
+    }
+  }
+}

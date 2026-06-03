@@ -12,10 +12,12 @@ MAIN
     CONNECT TO ":memory:+driver='dbmsqt'"
     CALL OfficestoreCreate.create_officestore_database()
 
-    CALL com.WebServiceEngine.RegisterRestService(
-        "ServiceHelper", "officestore")
-
     CALL startlog("officestoreService.log")
+
+    VAR success = ServiceHelper.registerService("officestore")
+    IF NOT success THEN
+        EXIT PROGRAM -1
+    END IF
 
     IF arg_val(1) == "--debug" THEN
         LET ServiceHelper.useScopes = FALSE

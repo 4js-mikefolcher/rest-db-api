@@ -35,6 +35,9 @@ replay_pid*
 # Genero Local file extension
 *.local
 
+# Claude directory
+.claude/
+
 # Genero Directories
 bin/
 build/

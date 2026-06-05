@@ -1,6 +1,9 @@
 PACKAGE com.fourjs.restdblib
 
 PUBLIC CONSTANT cFetchOperation = "fetch"
+PUBLIC CONSTANT cInsertOperation = "insert"
+PUBLIC CONSTANT cUpdateOperation = "update"
+PUBLIC CONSTANT cDeleteOperation = "delete"
 
 PUBLIC TYPE TUserScopes RECORD
     scopeList DYNAMIC ARRAY OF STRING

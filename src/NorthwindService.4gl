@@ -5,6 +5,8 @@
 
 IMPORT com
 IMPORT FGL com.fourjs.restdblib.ServiceHelper
+IMPORT FGL com.fourjs.restdblib.WriteDelegates
+IMPORT FGL NorthwindWrites
 
 MAIN
     DEFINE lMessage STRING
@@ -16,6 +18,18 @@ MAIN
     IF NOT success THEN
        EXIT PROGRAM -1
     END IF
+
+    # Register the write delegates (delegate-only: the library has no generic
+    # write SQL). Single-key table:
+    CALL WriteDelegates.registerInsert(
+        "categories", FUNCTION NorthwindWrites.insertCategory)
+    CALL WriteDelegates.registerUpdate(
+        "categories", FUNCTION NorthwindWrites.updateCategory)
+    CALL WriteDelegates.registerDelete(
+        "categories", FUNCTION NorthwindWrites.deleteCategory)
+    # Composite-key table:
+    CALL WriteDelegates.registerUpdate(
+        "order_details", FUNCTION NorthwindWrites.updateOrderDetail)
 
     IF arg_val(1) == "--debug" THEN
         LET ServiceHelper.useScopes = FALSE

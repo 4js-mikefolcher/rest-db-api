@@ -31,13 +31,15 @@ FGLCOMPFLAGS := -M
 export FGLLDPATH := $(PROJECT_DIR):$(PROJECT_DIR)/$(BIN_DIR):$(FGLLDPATH)
 
 # ---- restdblib library ------------------------------------------------------
-LIB_MODULES := UserScopes JsonParser SQLHelper ServiceHelper
+LIB_MODULES := UserScopes JsonParser SQLHelper WriteDelegates ServiceHelper
 LIB_OBJ     := $(addprefix $(PKG_DIR)/,$(addsuffix .42m,$(LIB_MODULES)))
 
 # ---- example service programs ----------------------------------------------
 SERVICES    := NorthwindService CustdemoService OfficestoreService
-CREATE_MODS := CustdemoCreate OfficestoreCreate
-SERVICE_OBJ := $(addprefix $(BIN_DIR)/,$(addsuffix .42m,$(SERVICES) $(CREATE_MODS)))
+# Companion modules linked into a service program (DB create scripts, write
+# delegates) that must be compiled into bin/ before the service that imports them.
+EXTRA_MODS  := CustdemoCreate OfficestoreCreate NorthwindWrites
+SERVICE_OBJ := $(addprefix $(BIN_DIR)/,$(addsuffix .42m,$(SERVICES) $(EXTRA_MODS)))
 
 PORT ?= 8090
 
@@ -54,9 +56,9 @@ services: $(SERVICE_OBJ)
 $(PKG_DIR)/%.42m: $(SRC_DIR)/%.4gl
 	$(FGLCOMP) $(FGLCOMPFLAGS) -o . $<
 
-# ServiceHelper imports the other three library modules, so they must exist
-# first (FGLLDPATH resolves them from the package tree).
-$(PKG_DIR)/ServiceHelper.42m: $(PKG_DIR)/SQLHelper.42m $(PKG_DIR)/UserScopes.42m $(PKG_DIR)/JsonParser.42m
+# ServiceHelper imports the other library modules, so they must exist first
+# (FGLLDPATH resolves them from the package tree).
+$(PKG_DIR)/ServiceHelper.42m: $(PKG_DIR)/SQLHelper.42m $(PKG_DIR)/UserScopes.42m $(PKG_DIR)/JsonParser.42m $(PKG_DIR)/WriteDelegates.42m
 
 # Service / Create programs: plain modules, output goes into bin/. They depend
 # on the library (order-only: built first, but a lib rebuild alone need not
@@ -68,6 +70,7 @@ $(BIN_DIR)/%.42m: $(SRC_DIR)/%.4gl | $(LIB_OBJ)
 # compiled into bin/ first so fglcomp can resolve the import.
 $(BIN_DIR)/CustdemoService.42m:    $(BIN_DIR)/CustdemoCreate.42m
 $(BIN_DIR)/OfficestoreService.42m: $(BIN_DIR)/OfficestoreCreate.42m
+$(BIN_DIR)/NorthwindService.42m:   $(BIN_DIR)/NorthwindWrites.42m
 
 # ---- run helpers ------------------------------------------------------------
 # A UTF-8 locale is required: without it the engine returns serialization

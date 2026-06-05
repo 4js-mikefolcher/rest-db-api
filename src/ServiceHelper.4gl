@@ -10,6 +10,7 @@ IMPORT util
 IMPORT FGL com.fourjs.restdblib.SQLHelper
 IMPORT FGL com.fourjs.restdblib.UserScopes
 IMPORT FGL com.fourjs.restdblib.JsonParser
+IMPORT FGL com.fourjs.restdblib.WriteDelegates
 
 PUBLIC DEFINE internalError
     RECORD ATTRIBUTE(WSError = "Internal Server Error",
@@ -397,6 +398,129 @@ PUBLIC FUNCTION getQueryResults(
 
 END FUNCTION #getQueryResults
 
+##############################################################################################
+#+
+#+ insertRecord Inserts a record into the specified table. The actual write is
+#+ delegated to a callback registered with WriteDelegates.registerInsert; the
+#+ JSON body carries the row values.
+#+
+##############################################################################################
+PUBLIC FUNCTION insertRecord(
+    tableName STRING ATTRIBUTES(WSParam),
+    body util.JSONObject)
+    ATTRIBUTES(WSPost,
+        WSPath = "/table/{tableName}",
+        WSDescription = 'Inserts a record into the specified table (delegated)')
+    RETURNS util.JSONObject ATTRIBUTES(WSMedia = "application/json")
+
+    DEFINE request WriteDelegates.T_WriteRequest
+
+    IF NOT authorizationCheck(tableName, cInsertOperation) THEN
+        RETURN NULL
+    END IF
+
+    LET request.tableName = tableName
+    LET request.operation = cInsertOperation
+    LET request.body = body
+    LET request.scopes = httpContext["scopes"]
+
+    RETURN dispatchWrite(request)
+
+END FUNCTION #insertRecord
+
+##############################################################################################
+#+
+#+ updateRecord Updates the record(s) identified by the {keyValue} path segment
+#+ (single or composite key). The write is delegated to a callback registered
+#+ with WriteDelegates.registerUpdate; the JSON body carries the new values.
+#+
+##############################################################################################
+PUBLIC FUNCTION updateRecord(
+    tableName STRING ATTRIBUTES(WSParam),
+    keyValue STRING ATTRIBUTES(WSParam),
+    body util.JSONObject)
+    ATTRIBUTES(WSPut,
+        WSPath = "/table/{tableName}/{keyValue}",
+        WSDescription = 'Updates the keyed record in the specified table (delegated)')
+    RETURNS util.JSONObject ATTRIBUTES(WSMedia = "application/json")
+
+    DEFINE request WriteDelegates.T_WriteRequest
+
+    IF NOT authorizationCheck(tableName, cUpdateOperation) THEN
+        RETURN NULL
+    END IF
+
+    LET request.tableName = tableName
+    LET request.operation = cUpdateOperation
+    LET request.keyValue = keyValue
+    LET request.keyParts = WriteDelegates.parseKeyParts(keyValue)
+    LET request.body = body
+    LET request.scopes = httpContext["scopes"]
+
+    RETURN dispatchWrite(request)
+
+END FUNCTION #updateRecord
+
+##############################################################################################
+#+
+#+ deleteRecord Deletes the record(s) identified by the {keyValue} path segment
+#+ (single or composite key). The write is delegated to a callback registered
+#+ with WriteDelegates.registerDelete.
+#+
+##############################################################################################
+PUBLIC FUNCTION deleteRecord(
+    tableName STRING ATTRIBUTES(WSParam),
+    keyValue STRING ATTRIBUTES(WSParam))
+    ATTRIBUTES(WSDelete,
+        WSPath = "/table/{tableName}/{keyValue}",
+        WSDescription = 'Deletes the keyed record in the specified table (delegated)')
+    RETURNS util.JSONObject ATTRIBUTES(WSMedia = "application/json")
+
+    DEFINE request WriteDelegates.T_WriteRequest
+
+    IF NOT authorizationCheck(tableName, cDeleteOperation) THEN
+        RETURN NULL
+    END IF
+
+    LET request.tableName = tableName
+    LET request.operation = cDeleteOperation
+    LET request.keyValue = keyValue
+    LET request.keyParts = WriteDelegates.parseKeyParts(keyValue)
+    LET request.scopes = httpContext["scopes"]
+
+    RETURN dispatchWrite(request)
+
+END FUNCTION #deleteRecord
+
+##############################################################################################
+#+
+#+ dispatchWrite Runs a write request through WriteDelegates and translates the
+#+ result to an HTTP response: a success body on success, or a REST error.
+#+
+##############################################################################################
+PRIVATE FUNCTION dispatchWrite(request WriteDelegates.T_WriteRequest)
+    RETURNS util.JSONObject
+    DEFINE result WriteDelegates.T_WriteResult
+    DEFINE response util.JSONObject
+
+    LET result = WriteDelegates.dispatch(request.operation, request)
+
+    IF NOT result.ok THEN
+        CALL setWriteError(result.errorStatus, result.errorMessage)
+        RETURN NULL
+    END IF
+
+    IF result.body IS NOT NULL THEN
+        LET response = result.body
+    ELSE
+        LET response = util.JSONObject.create()
+        CALL response.put("rowsAffected", result.rowsAffected)
+    END IF
+
+    RETURN response
+
+END FUNCTION #dispatchWrite
+
 PRIVATE FUNCTION getQueryOperation(query STRING)
     DEFINE qTrim STRING
     DEFINE opStr STRING
@@ -478,3 +602,19 @@ FUNCTION setRestError(respCode STRING, tableName STRING)
             CALL com.WebServiceEngine.SetRestError(httpStatus, internalError)
     END CASE
 END FUNCTION #setRestError
+
+##############################################################################################
+#+
+#+ setWriteError Sets a REST error for a delegated write using the HTTP status
+#+ and message returned by the delegate, without coupling to the fixed _ERR_*
+#+ codes used by the read endpoints.
+#+
+##############################################################################################
+PRIVATE FUNCTION setWriteError(httpStatus INTEGER, message STRING)
+
+    INITIALIZE responseError TO NULL
+    LET responseError.respCode = httpStatus
+    LET responseError.respMessage = message
+    CALL com.WebServiceEngine.SetRestError(httpStatus, responseError)
+
+END FUNCTION #setWriteError

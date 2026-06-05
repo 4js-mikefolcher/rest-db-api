@@ -6,5 +6,9 @@
   "license": "4Js Usage License",
   "repository": "https://github.com/4js-mikefolcher/rest-db-api",
   "dependencies": {},
-  "root": "com/fourjs/restdblib"
+  "root": "com/fourjs/restdblib",
+  "docs": [
+    "README.md",
+    "USERGUIDE.md"
+  ]
 }

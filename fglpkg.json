@@ -1,6 +1,6 @@
 {
   "name": "restdblib",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Genero BDL library for creating RESTful web services",
   "author": "mifo@4js.com",
   "license": "4Js Usage License",
